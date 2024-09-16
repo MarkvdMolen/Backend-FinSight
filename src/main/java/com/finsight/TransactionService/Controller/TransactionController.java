@@ -21,4 +21,32 @@ public class TransactionController {
         List<Transaction> transactions = transactionService.getAllTransactions();
         return ResponseEntity.ok(transactions);
     }
+
+    // PUT endpoint om een transactie te updaten op basis van het ID
+    @PutMapping("/{id}")
+    public ResponseEntity<Transaction> updateTransaction(
+            @PathVariable Long id,
+            @RequestBody Transaction updatedTransaction) {
+
+        Optional<Transaction> existingTransactionOpt = transactionService.getTransactionById(id);
+
+        if (existingTransactionOpt.isPresent()) {
+            Transaction existingTransaction = existingTransactionOpt.get();
+
+            // Update de velden van de bestaande transactie met de nieuwe waarden
+            existingTransaction.setAccount(updatedTransaction.getAccount());
+            existingTransaction.setCategory(updatedTransaction.getCategory());
+            existingTransaction.setRecipient(updatedTransaction.getRecipient());
+            existingTransaction.setDescription(updatedTransaction.getDescription());
+            existingTransaction.setAmount(updatedTransaction.getAmount());
+            existingTransaction.setDate(updatedTransaction.getDate());
+
+            // Sla de bijgewerkte transactie op
+            transactionService.saveTransaction(existingTransaction);
+            return ResponseEntity.ok(existingTransaction);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }

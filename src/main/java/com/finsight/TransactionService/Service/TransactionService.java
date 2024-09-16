@@ -23,4 +23,8 @@ public class TransactionService {
     public Optional<Transaction> getTransactionById(Long id) {
         return transactionRepository.findById(id);
     }
+
+    public Transaction saveTransaction(Transaction transaction) {
+        return transactionRepository.save(transaction);
+    }
 }
