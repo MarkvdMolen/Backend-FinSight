@@ -13,21 +13,24 @@ public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long transactions_id;
 
-    @Column(name = "iban_bban", nullable = false)
-    private String ibanBban;
+    @Column(name = "account", nullable = false)
+    private String account;
 
-    @Column(name = "naam_tegenpartij", nullable = false)
-    private String naamTegenpartij;
+    @Column(name = "category", nullable = true)
+    private String category;
 
-    @Column(name = "omschrijving", nullable = false)
-    private String omschrijving;
+    @Column(name = "recipient ", nullable = false)
+    private String recipient;
 
-    @Column(name = "bedrag", nullable = false)
-    private BigDecimal bedrag;
+    @Column(name = "description", nullable = false)
+    private String description;
 
-    @Column(name = "datum", nullable = false)
-    private LocalDate datum;
+    @Column(name = "amount", nullable = false)
+    private BigDecimal amount;
+
+    @Column(name = "date", nullable = false)
+    private LocalDate date;
 }
 
