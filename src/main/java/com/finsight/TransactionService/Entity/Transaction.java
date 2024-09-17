@@ -32,5 +32,14 @@ public class Transaction {
 
     @Column(name = "date", nullable = false)
     private LocalDate date;
+
+    public Transaction(String account, String category, String recipient, String description, BigDecimal amount, LocalDate date) {
+        this.account = account;
+        this.category = category;
+        this.recipient = recipient;
+        this.description = description;
+        this.amount = amount;
+        this.date = date;
+    }
 }
 
