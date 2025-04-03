@@ -11,6 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
@@ -28,10 +33,33 @@ public class TransactionController {
     @Autowired
     private TransactionService transactionService;
 
-    // Endpoint om alle transacties op te halen
-    @GetMapping("/all")
-    public ResponseEntity<List<Transaction>> getAllTransactions() {
-        List<Transaction> transactions = transactionService.getAllTransactions();
+    /**
+     * Retrieve paginated, sorted, and filtered transactions.
+     * @param sortBy The field to sort by.
+     * @param direction The sort direction (asc or desc).
+     * @param filterCriteria A string to filter the transactions (e.g., by recipient or description).
+     * @param page The current page of results.
+     * @param size The number of results per page.
+     * @return Paginated and filtered transactions.
+     */
+    @GetMapping
+    public ResponseEntity<Page<Transaction>> getTransactions(
+            @RequestParam(value = "sort", defaultValue = "date") String sortBy,
+            @RequestParam(value = "direction", defaultValue = "asc") String direction,
+            @RequestParam(value = "filter", defaultValue = "") String filterCriteria,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+
+        // Create Sort object based on direction
+        Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name()) ?
+                Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        // Create Pageable object for pagination and sorting
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        // Call the service to find transactions with filtering, sorting, and pagination
+        Page<Transaction> transactions = transactionService.findTransactions(filterCriteria, pageable);
+
         return ResponseEntity.ok(transactions);
     }
 
@@ -103,7 +131,8 @@ public class TransactionController {
             return ResponseEntity.ok("File uploaded and processed successfully!");
 
         } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file: " + ex.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Given file is of wrong format");
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file: " + ex.getMessage());
         }
     }
 
