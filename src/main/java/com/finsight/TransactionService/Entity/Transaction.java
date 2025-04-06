@@ -33,6 +33,9 @@ public class Transaction {
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
+    @Column(name = "row_hash", unique = true)
+    private String rowHash;
+
     public Transaction(String account, String category, String recipient, String description, BigDecimal amount, LocalDate date) {
         this.account = account;
         this.category = category;

@@ -2,6 +2,7 @@ package com.finsight.TransactionService.Controller;
 import com.finsight.TransactionService.Entity.Transaction;
 import com.finsight.TransactionService.Entity.TransactionCSV;
 import com.finsight.TransactionService.Service.TransactionService;
+import com.finsight.UtilClasses.HashUtil;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.bean.HeaderColumnNameMappingStrategy;
@@ -114,18 +115,32 @@ public class TransactionController {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // Pas dit aan als het CSV-bestand een ander datumformaat gebruikt
 
             for (TransactionCSV csvRecord : csvRecords) {
-                LocalDate parsedDate = LocalDate.parse(csvRecord.getDate(), formatter);  // Parse de datum met de formatter
-
-                // Oplossing voor het getal met komma's
+                LocalDate parsedDate = LocalDate.parse(csvRecord.getDate(), formatter);
                 BigDecimal parsedAmount = parseAmount(csvRecord.getAmount());
 
-                transactionService.saveTransaction(new Transaction(
+                String hash = HashUtil.generateTransactionHash(
                         csvRecord.getAccount(),
-                        null,
                         csvRecord.getRecipient(),
                         csvRecord.getDescription(),
                         parsedAmount,
-                        parsedDate));  // Gebruik de geparsete datum
+                        parsedDate
+                );
+
+                // Check of transactie met deze hash al bestaat
+                boolean exists = transactionService.existsByRowHash(hash);
+
+                if (!exists) {
+                    Transaction transaction = Transaction.builder()
+                            .account(csvRecord.getAccount())
+                            .recipient(csvRecord.getRecipient())
+                            .description(csvRecord.getDescription())
+                            .amount(parsedAmount)
+                            .date(parsedDate)
+                            .rowHash(hash)
+                            .build();
+
+                    transactionService.saveTransaction(transaction);
+                }
             }
 
             return ResponseEntity.ok("File uploaded and processed successfully!");

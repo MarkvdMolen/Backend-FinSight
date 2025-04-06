@@ -50,4 +50,8 @@ public class TransactionService {
     public Transaction saveTransaction(Transaction transaction) {
         return transactionRepository.save(transaction);
     }
+
+    public boolean existsByRowHash(String rowHash) {
+        return transactionRepository.existsByRowHash(rowHash);
+    }
 }

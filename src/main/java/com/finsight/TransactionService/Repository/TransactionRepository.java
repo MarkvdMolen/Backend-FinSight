@@ -16,4 +16,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
      */
     Page<Transaction> findByRecipientContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
             String recipient, String description, Pageable pageable);
+
+    boolean existsByRowHash(String rowHash);
 }
