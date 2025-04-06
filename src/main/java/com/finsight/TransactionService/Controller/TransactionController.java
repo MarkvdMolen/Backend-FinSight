@@ -23,9 +23,7 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/transactions")
@@ -52,8 +50,7 @@ public class TransactionController {
             @RequestParam(value = "size", defaultValue = "10") int size) {
 
         // Create Sort object based on direction
-        Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name()) ?
-                Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Sort sort = direction.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
         // Create Pageable object for pagination and sorting
         Pageable pageable = PageRequest.of(page, size, sort);
@@ -156,4 +153,28 @@ public class TransactionController {
         String normalizedAmount = amountStr.replace(",", ".");
         return new BigDecimal(normalizedAmount);
     }
+
+    @PostMapping("/bulk-update")
+    public ResponseEntity<?> bulkUpdateTransactions(@RequestBody List<Transaction> updatedTransactions) {
+        for (Transaction updated : updatedTransactions) {
+            Optional<Transaction> existingOpt = transactionService.getTransactionById(updated.getTransactions_id());
+
+            if (existingOpt.isPresent()) {
+                Transaction existing = existingOpt.get();
+                existing.setAccount(updated.getAccount());
+                existing.setRecipient(updated.getRecipient());
+                existing.setDescription(updated.getDescription());
+                existing.setAmount(updated.getAmount());
+                existing.setCategory(updated.getCategory());
+                existing.setDate(updated.getDate());
+
+                transactionService.saveTransaction(existing);
+            }
+        }
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Transacties succesvol geüpdatet");
+        return ResponseEntity.ok(response);
+    }
+
 }
