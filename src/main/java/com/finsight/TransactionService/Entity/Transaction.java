@@ -13,7 +13,8 @@ public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long transactions_id;
+    @Column(name = "transactions_id")
+    private Long transactionsId;
 
     @Column(name = "account", nullable = false)
     private String account;

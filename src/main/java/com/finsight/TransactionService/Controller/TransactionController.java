@@ -157,7 +157,7 @@ public class TransactionController {
     @PostMapping("/bulk-update")
     public ResponseEntity<?> bulkUpdateTransactions(@RequestBody List<Transaction> updatedTransactions) {
         for (Transaction updated : updatedTransactions) {
-            Optional<Transaction> existingOpt = transactionService.getTransactionById(updated.getTransactions_id());
+            Optional<Transaction> existingOpt = transactionService.getTransactionById(updated.getTransactionsId());
 
             if (existingOpt.isPresent()) {
                 Transaction existing = existingOpt.get();
