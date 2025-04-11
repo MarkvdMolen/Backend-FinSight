@@ -18,4 +18,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             String recipient, String description, Pageable pageable);
 
     boolean existsByRowHash(String rowHash);
+
+    long countByCategoryIsNull();
 }

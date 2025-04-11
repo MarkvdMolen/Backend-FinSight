@@ -177,4 +177,15 @@ public class TransactionController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/count-uncategorized")
+    public ResponseEntity<Map<String, Long>> countUncategorizedTransactions() {
+        long count = transactionService.countByCategoryIsNull();
+
+        Map<String, Long> response = new HashMap<>();
+        response.put("count", count);
+
+        return ResponseEntity.ok(response);
+    }
+
+
 }

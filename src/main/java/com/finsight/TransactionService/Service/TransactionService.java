@@ -54,4 +54,8 @@ public class TransactionService {
     public boolean existsByRowHash(String rowHash) {
         return transactionRepository.existsByRowHash(rowHash);
     }
+
+    public long countByCategoryIsNull() {
+        return transactionRepository.countByCategoryIsNull();
+    }
 }
