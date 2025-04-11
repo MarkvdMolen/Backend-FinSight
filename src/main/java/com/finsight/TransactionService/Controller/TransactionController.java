@@ -177,12 +177,14 @@ public class TransactionController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/count-uncategorized")
+    @GetMapping("/count-categorized")
     public ResponseEntity<Map<String, Long>> countUncategorizedTransactions() {
-        long count = transactionService.countByCategoryIsNull();
+        long count = transactionService.countByCategoryIsNotNull();
+        long totalTransactions = transactionService.countAllTransactions();
 
         Map<String, Long> response = new HashMap<>();
         response.put("count", count);
+        response.put("total", totalTransactions);
 
         return ResponseEntity.ok(response);
     }

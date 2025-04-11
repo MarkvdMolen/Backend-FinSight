@@ -55,7 +55,11 @@ public class TransactionService {
         return transactionRepository.existsByRowHash(rowHash);
     }
 
-    public long countByCategoryIsNull() {
-        return transactionRepository.countByCategoryIsNull();
+    public long countByCategoryIsNotNull() {
+        return transactionRepository.countByCategoryIsNotNull();
+    }
+
+    public long countAllTransactions() {
+        return transactionRepository.count();
     }
 }

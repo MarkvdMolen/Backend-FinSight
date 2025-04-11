@@ -19,5 +19,5 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     boolean existsByRowHash(String rowHash);
 
-    long countByCategoryIsNull();
+    long countByCategoryIsNotNull();
 }
