@@ -37,6 +37,9 @@ public class Transaction {
     @Column(name = "row_hash", unique = true)
     private String rowHash;
 
+    @Column(name = "classification_source", unique = true)
+    private String classificationSource;
+
     public Transaction(String account, String category, String recipient, String description, BigDecimal amount, LocalDate date) {
         this.account = account;
         this.category = category;
