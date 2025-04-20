@@ -74,6 +74,7 @@ public class TransactionController {
 
             // Update de velden van de bestaande transactie met de nieuwe waarden
             existingTransaction.setAccount(updatedTransaction.getAccount());
+            existingTransaction.setClassificationSource(updatedTransaction.getClassificationSource());
             existingTransaction.setCategory(updatedTransaction.getCategory());
             existingTransaction.setRecipient(updatedTransaction.getRecipient());
             existingTransaction.setDescription(updatedTransaction.getDescription());
