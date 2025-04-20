@@ -106,7 +106,7 @@ public class TransactionController {
             // Verwerk de CSV-bestanden en map de gegevens naar het TransactionCsvModel
             List<TransactionCSV> csvRecords = new CsvToBeanBuilder<TransactionCSV>(reader)
                     .withMappingStrategy(strategy)
-                    .withSkipLines(1) // Sla de kopregel over
+                    .withIgnoreLeadingWhiteSpace(true)
                     .build()
                     .parse();
 
@@ -135,6 +135,7 @@ public class TransactionController {
                             .amount(parsedAmount)
                             .date(parsedDate)
                             .rowHash(hash)
+                            .classificationSource(0)
                             .build();
 
                     transactionService.saveTransaction(transaction);
@@ -144,6 +145,7 @@ public class TransactionController {
             return ResponseEntity.ok("File uploaded and processed successfully!");
 
         } catch (Exception ex) {
+            ex.printStackTrace();  // Debuggen for errors
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Given file is of wrong format");
 //            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to upload file: " + ex.getMessage());
         }
@@ -166,6 +168,7 @@ public class TransactionController {
                 existing.setRecipient(updated.getRecipient());
                 existing.setDescription(updated.getDescription());
                 existing.setAmount(updated.getAmount());
+                existing.setClassificationSource(updated.getClassificationSource());
                 existing.setCategory(updated.getCategory());
                 existing.setDate(updated.getDate());
 
