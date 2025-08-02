@@ -6,6 +6,14 @@ import com.finsight.UtilClasses.HashUtil;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.bean.HeaderColumnNameMappingStrategy;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +35,11 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/transactions")
+@Tag(
+        name = "Transactions",
+        description = "Provides standard CRUD operations and additional endpoints to retrieve specific details " +
+                "for bank statement transactions."
+)
 public class TransactionController {
 
     @Autowired
@@ -41,6 +54,12 @@ public class TransactionController {
      * @param size The number of results per page.
      * @return Paginated and filtered transactions.
      */
+//    @Operation(summary = "Ontvang alle transacties van een gebruik ... pagination toevoegen")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "Lijst met gebruikers",
+//                    content = @Content(mediaType = "application/json",
+//                            schema = @Schema(implementation = User.class)))
+//    })
     @GetMapping
     public ResponseEntity<Page<Transaction>> getTransactions(
             @RequestParam(value = "sort", defaultValue = "date") String sortBy,
@@ -62,9 +81,22 @@ public class TransactionController {
     }
 
     // PUT endpoint om een transactie te updaten op basis van het ID
+    @Operation(
+            summary = "Update an existing Transaction",
+            description = "Request to update the details of a specific transaction identified by its ID."
+    )
     @PutMapping("/{id}")
     public ResponseEntity<Transaction> updateTransaction(
+            @Parameter(description = "Transaction ID")
             @PathVariable Long id,
+
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Update an existing Transaction",
+                    required = true,
+                    content = @Content(
+                            schema = @Schema(implementation = Transaction.class)
+                    )
+            )
             @RequestBody Transaction updatedTransaction) {
 
         Optional<Transaction> existingTransactionOpt = transactionService.getTransactionById(id);
