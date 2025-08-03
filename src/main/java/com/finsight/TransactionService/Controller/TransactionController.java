@@ -142,7 +142,8 @@ public class TransactionController {
                     .build()
                     .parse();
 
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // Pas dit aan als het CSV-bestand een ander datumformaat gebruikt
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            // Pas dit aan als het CSV-bestand een ander datumformaat gebruikt
 
             for (TransactionCSV csvRecord : csvRecords) {
                 LocalDate parsedDate = LocalDate.parse(csvRecord.getDate(), formatter);

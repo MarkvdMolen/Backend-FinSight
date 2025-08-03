@@ -30,7 +30,7 @@ public class Transaction {
 
     @NotBlank
     @Column(name = "account", nullable = false)
-    @Schema(description = "Account number or identifier", example = "NL91ABNA0417164300")
+    @Schema(description = "Name of the bank account", example = "NL91ABNA0417164300")
     private String account;
 
     @Column(name = "category")
@@ -39,17 +39,17 @@ public class Transaction {
 
     @NotBlank
     @Column(name = "recipient", nullable = false)
-    @Schema(description = "Recipient name", example = "Albert Heijn")
+    @Schema(description = "Name of the recipient", example = "Albert Heijn")
     private String recipient;
 
     @NotBlank
     @Column(name = "description", nullable = false)
-    @Schema(description = "Transaction description", example = "Weekly grocery shopping")
+    @Schema(description = "Description of the Transaction", example = "Weekly grocery shopping")
     private String description;
 
     @NotNull
     @Column(name = "amount", nullable = false)
-    @Schema(description = "Transaction amount in EUR (kan positief of negatief zijn)", example = "-52.75")
+    @Schema(description = "Transaction amount in EUR (negatives are allowed)", example = "-52.75")
     private BigDecimal amount;
 
     @NotNull
@@ -58,14 +58,15 @@ public class Transaction {
     private LocalDate date;
 
     @Column(name = "row_hash", unique = true)
-    @Schema(description = "Unique hash to detect duplicates", example = "a12b34c56d78e90f")
+    @Schema(description = "Unique hash based on all data from a transaction, " +
+            "to never get duplicates when uploading a older transaction even if its edited", example = "a12b34c56d78e90f")
     private String rowHash;
 
 
     // ENUM VAN MAKEN
     @NotNull
     @Column(name = "classification_source", nullable = false)
-    @Schema(description = "Classification source ID", example = "0")
+    @Schema(description = "Identifier for type of classification source", example = "0")
     private Integer classificationSource = 0;
 
     public Transaction(String account, String category, String recipient, String description, BigDecimal amount, LocalDate date) {
