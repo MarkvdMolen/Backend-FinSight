@@ -236,6 +236,21 @@ public class TransactionController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            summary = "Get categorized transactions count",
+            description = "Returns the number of transactions that have a category assigned, "
+                    + "along with the total number of transactions. <br>"
+                    + "Where count represents the categorized transactions."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Successfully retrieved counts",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(example = "{ \"total\": 450, \"count\": 120 }")
+            )
+    )
+    @ApiResponse(responseCode = "500", description = "Server Error", content = @Content)
     @GetMapping("/count-categorized")
     public ResponseEntity<Map<String, Long>> countUncategorizedTransactions() {
         long count = transactionService.countByCategoryIsNotNull();
