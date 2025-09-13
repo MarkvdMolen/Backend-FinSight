@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -121,8 +122,29 @@ public class TransactionController {
         }
     }
 
-    @PostMapping("/upload")
-    public ResponseEntity<String> uploadCsvFile(@RequestParam("file") MultipartFile file) {
+    @Operation(
+            summary = "Uploads a CSV file",
+            description = "Uploads a CSV file containing transaction data to be processed and stored."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "File successfully uploaded"),
+            @ApiResponse(responseCode = "400", description = "Invalid file format or empty file"),
+            @ApiResponse(responseCode = "404", description = "File does not exist"),
+            @ApiResponse(responseCode = "405", description = "FOR NOW WHEN DELETING OR USING GET"),
+            @ApiResponse(responseCode = "500", description = "Server Error"),
+    })
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> uploadCsvFile(
+        @Parameter(
+                description = "The CSV file to upload",
+                required = true,
+                content = @Content(
+                        mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
+                        schema = @Schema(type = "string", format = "binary")
+                )
+        )
+        @RequestParam("csv file") MultipartFile file) {
+
         if (file.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please upload a file");
         }
