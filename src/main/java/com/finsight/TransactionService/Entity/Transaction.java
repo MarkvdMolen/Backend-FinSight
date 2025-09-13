@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 
 @Entity
@@ -40,13 +41,17 @@ public class Transaction {
     @Column(name = "classification_source", nullable = false)
     private Integer classificationSource = 0;
 
-    public Transaction(String account, String category, String recipient, String description, BigDecimal amount, LocalDate date) {
+    @Column(name = "group_id", nullable = false)
+    private BigInteger group_id;
+
+    public Transaction(String account, String category, String recipient, String description, BigDecimal amount, LocalDate date, BigInteger group_id) {
         this.account = account;
         this.category = category;
         this.recipient = recipient;
         this.description = description;
         this.amount = amount;
         this.date = date;
+        this.group_id = group_id;
     }
 }
 
