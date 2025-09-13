@@ -48,7 +48,15 @@ public class TransactionService {
      * @return The saved transaction.
      */
     public Transaction saveTransaction(Transaction transaction) {
-        return transactionRepository.save(transaction);
+        Transaction saved = transactionRepository.save(transaction);
+
+        // Set the id first, then if group_id = null copy the value into group_id
+        if (saved.getGroup_id() == null) {
+            saved.setGroup_id(saved.getTransactionsId());
+            saved = transactionRepository.save(saved);
+        }
+
+        return saved;
     }
 
     public boolean existsByRowHash(String rowHash) {

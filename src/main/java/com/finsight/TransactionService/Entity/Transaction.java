@@ -41,10 +41,10 @@ public class Transaction {
     @Column(name = "classification_source", nullable = false)
     private Integer classificationSource = 0;
 
-    @Column(name = "group_id", nullable = false)
-    private BigInteger group_id;
+    @Column(name = "group_id")
+    private Long group_id;
 
-    public Transaction(String account, String category, String recipient, String description, BigDecimal amount, LocalDate date, BigInteger group_id) {
+    public Transaction(String account, String category, String recipient, String description, BigDecimal amount, LocalDate date, Long group_id) {
         this.account = account;
         this.category = category;
         this.recipient = recipient;
