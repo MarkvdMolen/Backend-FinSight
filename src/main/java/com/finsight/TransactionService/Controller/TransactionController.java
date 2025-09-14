@@ -55,12 +55,16 @@ public class TransactionController {
      * @param size The number of results per page.
      * @return Paginated and filtered transactions.
      */
-//    @Operation(summary = "Ontvang alle transacties van een gebruik ... pagination toevoegen")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "Lijst met gebruikers",
-//                    content = @Content(mediaType = "application/json",
-//                            schema = @Schema(implementation = User.class)))
-//    })
+    @Operation(
+            summary = "Retrieve a paginated list of transactions",
+            description = "Returns a pagination object containing metadata (page, size, totalElements, totalPages) "
+                    + "and the actual list of transactions in the `content` field. <br>"
+                    + "Use query parameters to control pagination."
+    )
+    @ApiResponse(responseCode = "200", description = "PageTransaction with a list of transactions in the content.")
+    @ApiResponse(responseCode = "400", description = "Invalid pagination parameters (NO IMPLEMENTATION YET)")
+    @ApiResponse(responseCode = "500", description = "Server Error")
+
     @GetMapping
     public ResponseEntity<Page<Transaction>> getTransactions(
             @RequestParam(value = "sort", defaultValue = "date") String sortBy,
