@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDate;
 
 @Entity
@@ -69,13 +70,17 @@ public class Transaction {
     @Schema(description = "Identifier for type of classification source", example = "0")
     private Integer classificationSource = 0;
 
-    public Transaction(String account, String category, String recipient, String description, BigDecimal amount, LocalDate date) {
+    @Column(name = "group_id")
+    private Long group_id;
+
+    public Transaction(String account, String category, String recipient, String description, BigDecimal amount, LocalDate date, Long group_id) {
         this.account = account;
         this.category = category;
         this.recipient = recipient;
         this.description = description;
         this.amount = amount;
         this.date = date;
+        this.group_id = group_id;
     }
 }
 
