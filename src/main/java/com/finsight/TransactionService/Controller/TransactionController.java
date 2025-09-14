@@ -62,8 +62,8 @@ public class TransactionController {
                     + "Use query parameters to control pagination."
     )
     @ApiResponse(responseCode = "200", description = "PageTransaction with a list of transactions in the content.")
-    @ApiResponse(responseCode = "400", description = "Invalid pagination parameters (NO IMPLEMENTATION YET)")
-    @ApiResponse(responseCode = "500", description = "Server Error")
+    @ApiResponse(responseCode = "400", description = "Invalid pagination parameters (NO IMPLEMENTATION YET)", content = @Content)
+    @ApiResponse(responseCode = "500", description = "Server Error", content = @Content)
 
     @GetMapping
     public ResponseEntity<Page<Transaction>> getTransactions(
@@ -90,6 +90,17 @@ public class TransactionController {
             summary = "Update an existing Transaction",
             description = "Request to update the details of a specific transaction identified by its ID."
     )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Transaction successfully updated",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Transaction.class)
+            )
+    )
+    @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Transaction not found", content = @Content)
+    @ApiResponse(responseCode = "500", description = "Server Error", content = @Content)
     @PutMapping("/{id}")
     public ResponseEntity<Transaction> updateTransaction(
             @Parameter(description = "Transaction ID")
