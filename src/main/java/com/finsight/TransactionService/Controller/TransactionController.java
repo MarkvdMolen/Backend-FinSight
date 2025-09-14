@@ -6,8 +6,17 @@ import com.finsight.UtilClasses.HashUtil;
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.bean.HeaderColumnNameMappingStrategy;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,6 +36,11 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/transactions")
+@Tag(
+        name = "Transactions",
+        description = "Provides standard CRUD operations and additional endpoints to retrieve specific details " +
+                "for bank statement transactions."
+)
 public class TransactionController {
 
     @Autowired
@@ -41,6 +55,16 @@ public class TransactionController {
      * @param size The number of results per page.
      * @return Paginated and filtered transactions.
      */
+    @Operation(
+            summary = "Retrieve a paginated list of transactions",
+            description = "Returns a pagination object containing metadata (page, size, totalElements, totalPages) "
+                    + "and the actual list of transactions in the `content` field. <br>"
+                    + "Use query parameters to control pagination."
+    )
+    @ApiResponse(responseCode = "200", description = "PageTransaction with a list of transactions in the content.")
+    @ApiResponse(responseCode = "400", description = "Invalid pagination parameters (NO IMPLEMENTATION YET)", content = @Content)
+    @ApiResponse(responseCode = "500", description = "Server Error", content = @Content)
+
     @GetMapping
     public ResponseEntity<Page<Transaction>> getTransactions(
             @RequestParam(value = "sort", defaultValue = "date") String sortBy,
@@ -61,10 +85,34 @@ public class TransactionController {
         return ResponseEntity.ok(transactions);
     }
 
-    // PUT endpoint om een transactie te updaten op basis van het ID
+
+    @Operation(
+            summary = "Update an existing Transaction",
+            description = "Request to update the details of a specific transaction identified by its ID."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Transaction successfully updated",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = Transaction.class)
+            )
+    )
+    @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content)
+    @ApiResponse(responseCode = "404", description = "Transaction not found", content = @Content)
+    @ApiResponse(responseCode = "500", description = "Internal server Error", content = @Content)
     @PutMapping("/{id}")
     public ResponseEntity<Transaction> updateTransaction(
+            @Parameter(description = "Transaction ID")
             @PathVariable Long id,
+
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "Update an existing Transaction",
+                    required = true,
+                    content = @Content(
+                            schema = @Schema(implementation = Transaction.class)
+                    )
+            )
             @RequestBody Transaction updatedTransaction) {
 
         Optional<Transaction> existingTransactionOpt = transactionService.getTransactionById(id);
@@ -89,8 +137,26 @@ public class TransactionController {
         }
     }
 
-    @PostMapping("/upload")
-    public ResponseEntity<String> uploadCsvFile(@RequestParam("file") MultipartFile file) {
+    @Operation(
+            summary = "Uploads a CSV file",
+            description = "Uploads a CSV file containing transaction data to be processed and stored."
+    )
+    @ApiResponse(responseCode = "200", description = "File uploaded and processed successfully!", content = @Content)
+    @ApiResponse(responseCode = "400", description = "Invalid file format or empty file", content = @Content)
+    @ApiResponse(responseCode = "405", description = "Wrong Request Type, should be `POST`", content = @Content)
+    @ApiResponse(responseCode = "500", description = "Internal server Error", content = @Content)
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> uploadCsvFile(
+        @Parameter(
+                description = "The CSV file to upload",
+                required = true,
+                content = @Content(
+                        mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
+                        schema = @Schema(type = "string", format = "binary")
+                )
+        )
+        @RequestParam("csv file") MultipartFile file) {
+
         if (file.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please upload a file");
         }
@@ -110,7 +176,8 @@ public class TransactionController {
                     .build()
                     .parse();
 
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd"); // Pas dit aan als het CSV-bestand een ander datumformaat gebruikt
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            // Pas dit aan als het CSV-bestand een ander datumformaat gebruikt
 
             for (TransactionCSV csvRecord : csvRecords) {
                 LocalDate parsedDate = LocalDate.parse(csvRecord.getDate(), formatter);
@@ -157,7 +224,17 @@ public class TransactionController {
         return new BigDecimal(normalizedAmount);
     }
 
-    @PostMapping("/bulk-update")
+    @Operation(
+            summary = "Bulk update transactions",
+            description = "Updates multiple existing transactions at once based on the provided list. "
+                    + "Each transaction in the request body must contain a valid `transactionsId`. "
+                    + "Only existing transactions will be updated; missing IDs will be ignored."
+    )
+    @ApiResponse(responseCode = "200", description = "Transactions successfully updated", content = @Content)
+    @ApiResponse(responseCode = "400", description = "Invalid request data (e.g., malformed JSON)", content = @Content)
+    @ApiResponse(responseCode = "404", description = "One or more transactions not found", content = @Content)
+    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+    @PutMapping("/bulk-update")
     public ResponseEntity<?> bulkUpdateTransactions(@RequestBody List<Transaction> updatedTransactions) {
         for (Transaction updated : updatedTransactions) {
             Optional<Transaction> existingOpt = transactionService.getTransactionById(updated.getTransactionsId());
@@ -181,6 +258,21 @@ public class TransactionController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+            summary = "Get categorized transactions count",
+            description = "Returns the number of transactions that have a category assigned, "
+                    + "along with the total number of transactions. <br>"
+                    + "Where count represents the categorized transactions."
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "Successfully retrieved counts",
+            content = @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(example = "{ \"total\": 450, \"count\": 120 }")
+            )
+    )
+    @ApiResponse(responseCode = "500", description = "Internal server Error", content = @Content)
     @GetMapping("/count-categorized")
     public ResponseEntity<Map<String, Long>> countUncategorizedTransactions() {
         long count = transactionService.countByCategoryIsNotNull();
