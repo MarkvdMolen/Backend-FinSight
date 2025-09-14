@@ -100,7 +100,7 @@ public class TransactionController {
     )
     @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content)
     @ApiResponse(responseCode = "404", description = "Transaction not found", content = @Content)
-    @ApiResponse(responseCode = "500", description = "Server Error", content = @Content)
+    @ApiResponse(responseCode = "500", description = "Internal server Error", content = @Content)
     @PutMapping("/{id}")
     public ResponseEntity<Transaction> updateTransaction(
             @Parameter(description = "Transaction ID")
@@ -144,7 +144,7 @@ public class TransactionController {
     @ApiResponse(responseCode = "200", description = "File uploaded and processed successfully!", content = @Content)
     @ApiResponse(responseCode = "400", description = "Invalid file format or empty file", content = @Content)
     @ApiResponse(responseCode = "405", description = "Wrong Request Type, should be `POST`", content = @Content)
-    @ApiResponse(responseCode = "500", description = "Server Error", content = @Content)
+    @ApiResponse(responseCode = "500", description = "Internal server Error", content = @Content)
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadCsvFile(
         @Parameter(
@@ -224,7 +224,17 @@ public class TransactionController {
         return new BigDecimal(normalizedAmount);
     }
 
-    @PostMapping("/bulk-update")
+    @Operation(
+            summary = "Bulk update transactions",
+            description = "Updates multiple existing transactions at once based on the provided list. "
+                    + "Each transaction in the request body must contain a valid `transactionsId`. "
+                    + "Only existing transactions will be updated; missing IDs will be ignored."
+    )
+    @ApiResponse(responseCode = "200", description = "Transactions successfully updated", content = @Content)
+    @ApiResponse(responseCode = "400", description = "Invalid request data (e.g., malformed JSON)", content = @Content)
+    @ApiResponse(responseCode = "404", description = "One or more transactions not found", content = @Content)
+    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+    @PutMapping("/bulk-update")
     public ResponseEntity<?> bulkUpdateTransactions(@RequestBody List<Transaction> updatedTransactions) {
         for (Transaction updated : updatedTransactions) {
             Optional<Transaction> existingOpt = transactionService.getTransactionById(updated.getTransactionsId());
@@ -262,7 +272,7 @@ public class TransactionController {
                     schema = @Schema(example = "{ \"total\": 450, \"count\": 120 }")
             )
     )
-    @ApiResponse(responseCode = "500", description = "Server Error", content = @Content)
+    @ApiResponse(responseCode = "500", description = "Internal server Error", content = @Content)
     @GetMapping("/count-categorized")
     public ResponseEntity<Map<String, Long>> countUncategorizedTransactions() {
         long count = transactionService.countByCategoryIsNotNull();
