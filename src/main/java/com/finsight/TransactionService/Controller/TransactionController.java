@@ -85,7 +85,7 @@ public class TransactionController {
         return ResponseEntity.ok(transactions);
     }
 
-    // PUT endpoint om een transactie te updaten op basis van het ID
+
     @Operation(
             summary = "Update an existing Transaction",
             description = "Request to update the details of a specific transaction identified by its ID."
@@ -141,13 +141,10 @@ public class TransactionController {
             summary = "Uploads a CSV file",
             description = "Uploads a CSV file containing transaction data to be processed and stored."
     )
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "File successfully uploaded"),
-            @ApiResponse(responseCode = "400", description = "Invalid file format or empty file"),
-            @ApiResponse(responseCode = "404", description = "File does not exist"),
-            @ApiResponse(responseCode = "405", description = "FOR NOW WHEN DELETING OR USING GET"),
-            @ApiResponse(responseCode = "500", description = "Server Error"),
-    })
+    @ApiResponse(responseCode = "200", description = "File uploaded and processed successfully!", content = @Content)
+    @ApiResponse(responseCode = "400", description = "Invalid file format or empty file", content = @Content)
+    @ApiResponse(responseCode = "405", description = "Wrong Request Type, should be `POST`", content = @Content)
+    @ApiResponse(responseCode = "500", description = "Server Error", content = @Content)
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadCsvFile(
         @Parameter(
