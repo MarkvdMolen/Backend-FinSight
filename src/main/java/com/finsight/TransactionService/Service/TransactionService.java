@@ -2,34 +2,58 @@ package com.finsight.TransactionService.Service;
 
 import com.finsight.TransactionService.Entity.Transaction;
 import com.finsight.TransactionService.Repository.TransactionRepository;
+import com.finsight.TransactionService.dto.SearchCriteriaDTO;
+import com.finsight.TransactionService.Spec.TransactionSpecification;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Optional;
 
 @Service
 public class TransactionService {
 
+    private final TransactionRepository transactionRepository;
+
     @Autowired
-    private TransactionRepository transactionRepository;
+    public TransactionService(TransactionRepository transactionRepository) {
+        this.transactionRepository = transactionRepository;
+    }
 
     /**
      * Retrieve transactions with optional filtering, sorting, and pagination.
      * If no filter criteria is provided, fetch all transactions with pagination and sorting.
-     * @param filterCriteria The string to filter the transactions by recipient or description.
+     * @param criteria The string to filter the transactions by recipient or description.
      * @param pageable The pagination and sorting configuration.
      * @return A paginated and sorted page of transactions.
      */
-    public Page<Transaction> findTransactions(String filterCriteria, Pageable pageable) {
+    public Page<Transaction> findTransactions(
+            SearchCriteriaDTO criteria,
+            Pageable pageable) {
+        // Bouw de Specification op uit de DTO
+        Specification<Transaction> spec = TransactionSpecification.byCriteria(criteria);
+        // findAll(spec, pageable) dekt zowel filteren als pagineren/ sorteren
+        return transactionRepository.findAll(spec, pageable);
+    }
+
+    /**
+     * Oude methode, nog beschikbaar voor eenvoudige filter-string.
+     * Je kunt callers migreren naar de nieuwe findTransactions(criteria, pageable).
+     */
+    public Page<Transaction> findTransactions(
+            String filterCriteria,
+            Pageable pageable) {
         if (filterCriteria == null || filterCriteria.isEmpty()) {
-            // Fetch all transactions with pagination and sorting
             return transactionRepository.findAll(pageable);
         } else {
-            // Fetch filtered transactions by recipient or description with pagination and sorting
-            return transactionRepository.findByRecipientContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
-                    filterCriteria, filterCriteria, pageable);
+            return transactionRepository
+                    .findByRecipientContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
+                            filterCriteria,
+                            filterCriteria,
+                            pageable);
         }
     }
 

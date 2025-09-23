@@ -3,6 +3,9 @@ import com.finsight.TransactionService.Entity.Transaction;
 import com.finsight.TransactionService.Entity.TransactionCSV;
 import com.finsight.TransactionService.Service.TransactionService;
 import com.finsight.UtilClasses.HashUtil;
+import com.finsight.TransactionService.dto.SearchCriteriaDTO;
+import com.finsight.TransactionService.Spec.TransactionSpecification;
+
 import com.opencsv.CSVReader;
 import com.opencsv.bean.CsvToBeanBuilder;
 import com.opencsv.bean.HeaderColumnNameMappingStrategy;
@@ -51,7 +54,6 @@ public class TransactionController {
      * Retrieve paginated, sorted, and filtered transactions.
      * @param sortBy The field to sort by.
      * @param direction The sort direction (asc or desc).
-     * @param filterCriteria A string to filter the transactions (e.g., by recipient or description).
      * @param page The current page of results.
      * @param size The number of results per page.
      * @return Paginated and filtered transactions.
@@ -68,9 +70,9 @@ public class TransactionController {
 
     @GetMapping
     public ResponseEntity<Page<Transaction>> getTransactions(
+            SearchCriteriaDTO criteria,
             @RequestParam(value = "sort", defaultValue = "date") String sortBy,
             @RequestParam(value = "direction", defaultValue = "asc") String direction,
-            @RequestParam(value = "filter", defaultValue = "") String filterCriteria,
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
 
@@ -81,7 +83,7 @@ public class TransactionController {
         Pageable pageable = PageRequest.of(page, size, sort);
 
         // Call the service to find transactions with filtering, sorting, and pagination
-        Page<Transaction> transactions = transactionService.findTransactions(filterCriteria, pageable);
+        Page<Transaction> transactions = transactionService.findTransactions(criteria, pageable);
 
         return ResponseEntity.ok(transactions);
     }
