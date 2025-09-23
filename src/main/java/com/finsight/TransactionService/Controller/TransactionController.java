@@ -157,7 +157,7 @@ public class TransactionController {
                         schema = @Schema(type = "string", format = "binary")
                 )
         )
-        @RequestParam("csv file") MultipartFile file) {
+        @RequestParam() MultipartFile file) {
 
         if (file.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Please upload a file");
