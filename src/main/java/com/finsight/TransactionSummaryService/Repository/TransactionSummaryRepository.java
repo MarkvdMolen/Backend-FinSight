@@ -15,4 +15,10 @@ public interface TransactionSummaryRepository extends JpaRepository<Transaction,
     )
     List<Object[]> getYearlyCategorySummary(@Param("year") int year);
 
+    @Query(
+            value = "SELECT * FROM get_yearly_summary(:year)",
+            nativeQuery = true
+    )
+    List<Object[]> getYearlySummary(@Param("year") int year);
+
 }
