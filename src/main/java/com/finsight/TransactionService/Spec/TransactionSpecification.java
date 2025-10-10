@@ -6,7 +6,11 @@ import com.finsight.TransactionService.Entity.Transaction;
 import org.springframework.data.jpa.domain.Specification;
 
 import jakarta.persistence.criteria.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -72,5 +76,26 @@ public class TransactionSpecification {
                 return cb.and(predicates.toArray(new Predicate[0]));
             }
         };
+    }
+
+    public static Specification<Transaction> dateBetween(LocalDate start, LocalDate end) {
+        return (root, q, cb) -> cb.between(root.get("date"), start, end);
+    }
+
+    public static Specification<Transaction> excludeCategories(Collection<String> excluded) {
+        return (root, q, cb) -> {
+            if (excluded == null || excluded.isEmpty()) return cb.conjunction();
+            return cb.not(root.get("category").in(excluded));
+        };
+    }
+
+    /** amount > 0 */
+    public static Specification<Transaction> incomeOnly() {
+        return (root, q, cb) -> cb.greaterThan(root.get("amount"), BigDecimal.ZERO);
+    }
+
+    /** amount < 0 */
+    public static Specification<Transaction> expenseOnly() {
+        return (root, q, cb) -> cb.lessThan(root.get("amount"), BigDecimal.ZERO);
     }
 }
