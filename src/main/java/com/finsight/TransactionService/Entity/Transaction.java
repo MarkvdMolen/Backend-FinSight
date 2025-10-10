@@ -73,6 +73,17 @@ public class Transaction {
     @Column(name = "group_id")
     private Long group_id;
 
+    @Transient
+    public boolean isIncome() {
+        return amount != null && amount.signum() > 0;
+    }
+
+    @Transient
+    public boolean isExpense() {
+        return amount != null && amount.signum() < 0;
+    }
+
+
     public Transaction(String account, String category, String recipient, String description, BigDecimal amount, LocalDate date, Long group_id) {
         this.account = account;
         this.category = category;
