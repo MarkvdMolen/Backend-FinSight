@@ -2,13 +2,11 @@ package com.finsight.TransactionService.Entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.time.LocalDate;
 
 @Entity
@@ -71,7 +69,7 @@ public class Transaction {
     private Integer classificationSource = 0;
 
     @Column(name = "group_id")
-    private Long group_id;
+    private Long groupId;
 
     @Transient
     public boolean isIncome() {
@@ -91,7 +89,7 @@ public class Transaction {
         this.description = description;
         this.amount = amount;
         this.date = date;
-        this.group_id = group_id;
+        this.groupId = group_id;
     }
 }
 

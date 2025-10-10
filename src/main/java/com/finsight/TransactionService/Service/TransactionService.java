@@ -75,8 +75,8 @@ public class TransactionService {
         Transaction saved = transactionRepository.save(transaction);
 
         // Set the id first, then if group_id = null copy the value into group_id
-        if (saved.getGroup_id() == null) {
-            saved.setGroup_id(saved.getTransactionsId());
+        if (saved.getGroupId() == null) {
+            saved.setGroupId(saved.getTransactionsId());
             saved = transactionRepository.save(saved);
         }
 

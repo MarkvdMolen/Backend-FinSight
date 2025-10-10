@@ -131,7 +131,7 @@ public class TransactionController {
             existingTransaction.setDescription(updatedTransaction.getDescription());
             existingTransaction.setAmount(updatedTransaction.getAmount());
             existingTransaction.setDate(updatedTransaction.getDate());
-            existingTransaction.setGroup_id(updatedTransaction.getGroup_id());
+            existingTransaction.setGroupId(updatedTransaction.getGroupId());
 
             // Sla de bijgewerkte transactie op
             transactionService.saveTransaction(existingTransaction);
@@ -207,7 +207,7 @@ public class TransactionController {
                             .date(parsedDate)
                             .rowHash(hash)
                             .classificationSource(0)
-                            .group_id(csvRecord.getId())
+                            .groupId(csvRecord.getId())
                             .build();
 
                     transactionService.saveTransaction(transaction);
@@ -253,7 +253,7 @@ public class TransactionController {
                 existing.setClassificationSource(updated.getClassificationSource());
                 existing.setCategory(updated.getCategory());
                 existing.setDate(updated.getDate());
-                existing.setGroup_id(updated.getGroup_id());
+                existing.setGroupId(updated.getGroupId());
 
                 transactionService.saveTransaction(existing);
             }
