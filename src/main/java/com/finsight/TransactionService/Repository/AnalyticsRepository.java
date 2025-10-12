@@ -15,22 +15,19 @@ public interface AnalyticsRepository extends Repository<com.finsight.Transaction
     // Monthly trend (income vs expenses)
     // =========================
     @Query(value = """
-      with base as (
-        select date_trunc('month', t.date) as month,
-               t.amount,
-               t.category
-        from transactions t
-        where t.date between :start and :end
+    select
+      (date_trunc('month', t.date))::date as month,
+      coalesce(sum(case when t.amount > 0 then t.amount else 0 end), 0)  as income,
+      coalesce(sum(case when t.amount < 0 then -t.amount else 0 end), 0) as expenses
+    from transactions t
+    where t.date between :start and :end
+      and (
+        :applyExcl = false
+        or ( :applyExcl = true and t.category not in (:excluded) )
       )
-      select
-        month as month,
-        coalesce(sum(case when amount > 0 then amount else 0 end), 0)  as income,
-        coalesce(sum(case when amount < 0 then -amount else 0 end), 0) as expenses
-      from base
-      where (:applyExcl = false OR category not in (:excluded))
-      group by month
-      order by month
-      """, nativeQuery = true)
+    group by 1
+    order by 1
+    """, nativeQuery = true)
     List<MonthlyTrendView> monthlyTrend(
             @Param("start") LocalDate start,
             @Param("end") LocalDate end,

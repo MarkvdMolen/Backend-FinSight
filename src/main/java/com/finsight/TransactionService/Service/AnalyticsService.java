@@ -48,9 +48,7 @@ public class AnalyticsService {
     }
 
     private MonthlyTrendDTO mapTrend(MonthlyTrendView v) {
-        OffsetDateTime odt = v.getMonth();
-        LocalDate month = odt.toLocalDate().withDayOfMonth(1);
-        return new MonthlyTrendDTO(month, nz(v.getIncome()), nz(v.getExpenses()));
+        return new MonthlyTrendDTO(v.getMonth(), nz(v.getIncome()), nz(v.getExpenses()));
         // income/expenses komen al positief uit de query
     }
 
