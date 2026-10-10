@@ -19,7 +19,7 @@ WORKDIR /app
 # Kopieer alleen het gegenereerde .jar bestand uit de builder stage
 COPY --from=builder /app/target/*.jar app.jar
 
-COPY .env .env
+# Supply credentials at runtime through environment variables or mounted secrets.
 
 # Stel de poort in waarop de app luistert
 EXPOSE 8080

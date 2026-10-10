@@ -31,6 +31,18 @@ public class FinsightApplication {
 		if (user != null) System.setProperty("DB_USERNAME", user);
 		if (password != null) System.setProperty("DB_PASSWORD", password);
 
+        // Only copy the provider settings; never expose the key material to the frontend.
+        for (String setting : new String[] {
+                "ENABLE_BANKING_ENABLED", "ENABLE_BANKING_APPLICATION_ID", "ENABLE_BANKING_PRIVATE_KEY_PATH",
+                "ENABLE_BANKING_ENCRYPTION_KEY", "ENABLE_BANKING_REDIRECT_URL", "ENABLE_BANKING_FRONTEND_URL",
+                "ENABLE_BANKING_BANK_NAME", "ENABLE_BANKING_CONSENT_DAYS",
+                "ENABLE_BANKING_CALLBACK_TLS_ENABLED", "ENABLE_BANKING_CALLBACK_TLS_PORT",
+                "ENABLE_BANKING_CALLBACK_KEY_STORE", "ENABLE_BANKING_CALLBACK_KEY_STORE_PASSWORD"
+        }) {
+            String value = dotenv.get(setting);
+            if (value != null && System.getProperty(setting) == null) System.setProperty(setting, value);
+        }
+
 		SpringApplication.run(FinsightApplication.class, args);
 	}
 }

@@ -12,7 +12,7 @@ Voer vanuit de backendmap uit:
 .\mvnw.cmd clean test
 ~~~
 
-Dit voert 26 tests uit. Docker, PostgreSQL en een .env zijn hiervoor niet nodig. Een eerste uitvoering kan Maven-dependencies downloaden. Gebruik na packagewijzigingen clean om oude classbestanden te verwijderen.
+Dit voert 52 tests uit. De banking-tests controleren JWT-ondertekening, sessieversleuteling, callback-state, providerverzoeken, rekeningherkenning en saldoverwerking met mocks; ze benaderen geen echte bank. Docker, PostgreSQL en een .env zijn hiervoor niet nodig. Een eerste uitvoering kan Maven-dependencies downloaden. Gebruik na packagewijzigingen clean om oude classbestanden te verwijderen.
 
 ## Spring-integratietest
 

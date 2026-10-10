@@ -63,19 +63,20 @@ public class WealthApplicationService {
     }
 
     public OverviewDTO getDashboard(final YearMonth month) {
-        final List<Account> accounts = getAccounts();
-
-        final List<BalanceSnapshot> snapshots =
-                getSnapshots(month.atEndOfMonth());
-
-        final List<FinancialTransaction> transactions =
-                getTransactions(month);
-
-        return wealthBusinessService.calculateDashboard(
-                month,
-                accounts,
-                snapshots,
-                transactions
-        );
+        final List<Account> allAccounts = getAccounts();
+        final boolean balanceOnly = allAccounts.stream()
+                .anyMatch(account -> account.getBankConnection() != null);
+        // Existing demo/manual accounts remain stored but are not mixed into a live total.
+        final List<Account> accounts = balanceOnly
+                ? allAccounts.stream().filter(account -> account.getBankConnection() != null).toList()
+                : allAccounts;
+        final java.util.Set<Long> ids = accounts.stream().map(Account::getId)
+                .collect(java.util.stream.Collectors.toSet());
+        final List<BalanceSnapshot> snapshots = getSnapshots(month.atEndOfMonth()).stream()
+                .filter(snapshot -> !balanceOnly || ids.contains(snapshot.getAccount().getId())).toList();
+        final List<FinancialTransaction> transactions = balanceOnly ? List.of() : getTransactions(month);
+        final OverviewDTO overview = wealthBusinessService.calculateDashboard(month, accounts, snapshots, transactions);
+        return balanceOnly ? new OverviewDTO(overview.asOf(), overview.monthLabel(), overview.income(),
+                overview.expenses(), overview.accounts(), overview.history(), true) : overview;
     }
 }

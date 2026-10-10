@@ -1,5 +1,10 @@
 package com.finsight.wealth.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.finsight.banking.entity.BankConnection;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -38,6 +43,18 @@ public class Account {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AccountType type;
+
+    @JsonIgnore
+    @Column(unique = true, length = 1024)
+    private String enableBankingIdentificationHash;
+
+    @JsonIgnore
+    private String enableBankingUid;
+
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "bank_connection_id")
+    private BankConnection bankConnection;
 
     public enum AccountType {
         CASH,

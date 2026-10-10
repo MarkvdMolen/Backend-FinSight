@@ -40,4 +40,8 @@ public class BalanceSnapshot {
 
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal balance;
+
+    private String balanceType;
+
+    private java.time.Instant retrievedAt;
 }

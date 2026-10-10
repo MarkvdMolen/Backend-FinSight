@@ -88,4 +88,30 @@ class WealthApplicationServiceTest {
         verify(wealthBusinessService).calculateDashboard(month, accounts, snapshots, transactions);
         verifyNoInteractions(categoryRepository);
     }
+    @Test
+    void linkedDashboardExcludesDemoBalancesAndDoesNotFetchTransactions() {
+        YearMonth month = YearMonth.of(2026, 10);
+        Account demo = new Account();
+        demo.setId(1L);
+        Account live = new Account();
+        live.setId(2L);
+        live.setBankConnection(new com.finsight.banking.entity.BankConnection());
+        BalanceSnapshot demoSnapshot = new BalanceSnapshot();
+        demoSnapshot.setAccount(demo);
+        BalanceSnapshot liveSnapshot = new BalanceSnapshot();
+        liveSnapshot.setAccount(live);
+        when(accountRepository.findAll(Sort.by("id"))).thenReturn(List.of(demo, live));
+        when(balanceSnapshotRepository.findAllByDateLessThanEqualOrderByDateAsc(month.atEndOfMonth()))
+                .thenReturn(List.of(demoSnapshot, liveSnapshot));
+        OverviewDTO calculated = new OverviewDTO("10 oktober 2026", "oktober 2026",
+                BigDecimal.ZERO, BigDecimal.ZERO, List.of(), List.of());
+        when(wealthBusinessService.calculateDashboard(month, List.of(live), List.of(liveSnapshot), List.of()))
+                .thenReturn(calculated);
+
+        OverviewDTO result = service.getDashboard(month);
+
+        org.junit.jupiter.api.Assertions.assertTrue(result.balanceOnly());
+        verify(wealthBusinessService).calculateDashboard(month, List.of(live), List.of(liveSnapshot), List.of());
+        verifyNoInteractions(financialTransactionRepository);
+    }
 }

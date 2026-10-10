@@ -9,6 +9,11 @@ public record OverviewDTO(
         BigDecimal income,
         BigDecimal expenses,
         List<AccountDTO> accounts,
-        List<HistoryDTO> history
+        List<HistoryDTO> history,
+        boolean balanceOnly
 ) {
+    public OverviewDTO(String asOf, String monthLabel, BigDecimal income, BigDecimal expenses,
+                       List<AccountDTO> accounts, List<HistoryDTO> history) {
+        this(asOf, monthLabel, income, expenses, accounts, history, false);
+    }
 }

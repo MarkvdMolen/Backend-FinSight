@@ -32,3 +32,13 @@ build/
 ### VS Code ###
 .vscode/
 .env
+
+# Local Open Banking credentials
+.secrets/
+*.pem
+.env.*
+!.env.example
+*.key
+*.p12
+*.pfx
+*.jks
